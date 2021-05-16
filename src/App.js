@@ -1,112 +1,78 @@
 import "./App.scss";
-import { useEffect, useState } from "react";
 import Header from "./components/header";
 import Tasks from "./components/tasks";
 import NewTask from "./components/new-task";
-import { addTask, fetchTasks } from "./components/api-serivice";
-import { Button, createMuiTheme } from "@material-ui/core";
-import { ThemeProvider } from '@material-ui/styles';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import AddIcon from '@material-ui/icons/Add';
+import GlobalCtxProvider from "./context/global-context";
+import {createBrowserHistory} from "history";
 
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#af7eeb'
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+} from "react-router-dom";
+import {makeStyles} from "@material-ui/core/styles";
+import {useEffect} from "react";
+
+const AppStyle = makeStyles({
+    content: {
+        maxHeight: '300px',
+        padding: '0 20px',
+        overflowX: 'hidden',
+        overflowY: 'auto',
+        backgroundColor: 'var(--color-1)',
+        color: 'var(--color-2)',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        webkitBoxShadow: '0 10px 6px -6px #777',
+        mozBoxShadow: '0 10px 6px -6px #777',
+        boxShadow: '0 6px 20px -6px #777',
+        height: '300px'
+    },
+    App: {
+        margin: '0 auto',
+        maxWidth: '400px',
+        overflowX: 'hidden',
     }
-  },
-});
+})
+
+const history = createBrowserHistory();
+
 function App() {
-  const token = "01ddd97564de72d38036789a32e7970372df6351";
-  const [tasks, setTasks] = useState();
-  const [newTask, setNewTask] = useState();
-  const [datetime, setDateTime] = useState("");
-  const [formShow, setFormShow] = useState(false);
+    const style = AppStyle();
 
-  useEffect(() => {
-    const date = new Date().toLocaleDateString("fr-ca");
-    const time = new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-    let current = `${date}T${time}`;
-    setDateTime(current);
-    fetchAllTasks();
-  }, []);
 
-  const fetchAllTasks = () => {
-    fetchTasks()
-      .then((res) => setTasks(res.data))
-      .catch(console.log);
-  };
+    useEffect(() => {
+        if (!localStorage.getItem('token')) {
+            const mytoken = '01ddd97564de72d38036789a32e7970372df6351'
+            let token = prompt("You need todoist a token to login this app " +
+                "if you dont have it ,you can get it from " +
+                "https://todoist.com or click ok to use my token")
+            localStorage.setItem('token', (token || mytoken))
+        }
+    }, []);
 
-  const addNewTask = () => {
-    if (!formShow) {
-      setFormShow(true);
-      return;
-    }
-
-    if (newTask) {
-      addTask(newTask, new Date(datetime))
-        .then(() => {
-          setFormShow(false);
-          fetchAllTasks();
-        })
-        .catch(console.log);
-    } else alert("Insert task name");
-  };
-
-  const changeInput = (e) => {
-    setNewTask(e.target.value);
-  };
-
-  const changeDateTime = (e) => {
-    setDateTime(e.target.value);
-  };
-  return (
-    <div className="App">
-      <Header></Header>
-      <div className="content">
-      {tasks && tasks.length ?
-        <>
-          {formShow ? (
-            <NewTask
-              changeInput={changeInput}
-              changeDateTime={changeDateTime}
-              datetime={datetime}
-            ></NewTask>
-          ) : (
-            <Tasks
-              fetchAllTasks={fetchAllTasks}
-              allTasks={tasks}
-              token={token}
-            ></Tasks>
-          )}
-
-          <div className="buttons-group">
-            <ThemeProvider theme={theme}>
-              {formShow && <Button variant="outlined"
-                size="small"
-                onClick={() => setFormShow(false)}
-              >
-                Back
-              </Button>}
-              <Button variant="contained" color="primary"
-                size="small" startIcon={<AddIcon />}
-                onClick={addNewTask}
-              >
-                {!formShow ? "New Task" : "Add Task"}
-              </Button>
-            </ThemeProvider>
-          </div>
-        </>
-        :
-        <CircularProgress disableShrink />
-      }
-       </div>
-    </div>
-  );
+    return (
+        <GlobalCtxProvider>
+            <div className={style.App}>
+                <Router history={history}>
+                    <Header/>
+                    <div className={style.content}>
+                        <Switch>
+                            <Route path="/newTask">
+                                <NewTask/>
+                            </Route>
+                            <Route path="/">
+                                <Tasks/>
+                            </Route>
+                        </Switch>
+                    </div>
+                </Router>
+            </div>
+        </GlobalCtxProvider>
+    );
 }
 
 export default App;
