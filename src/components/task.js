@@ -31,7 +31,6 @@ const TaskStyle = makeStyles({
 const Task = ({task = {}, fetchTasks}) => {
     const {setTasks} = useContext(GlobalCtx);
     const style = TaskStyle();
-    if (!task || !!task.section_id) return null;
 
     const closeTask = (task) => {
         statusChange(task)
