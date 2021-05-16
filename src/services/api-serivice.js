@@ -1,11 +1,9 @@
 import axios from "axios";
 import uuid from "react-uuid";
-
-const mytoken = '01ddd97564de72d38036789a32e7970372df6351';
-const token = localStorage.getItem('token') || mytoken;
+import {getToken} from "./auth-service";
 
 axios.interceptors.request.use(req => {
-    req.headers.Authorization = `Bearer ${token}`
+    req.headers.Authorization = `Bearer ${getToken()}`
     return req
 })
 
@@ -15,12 +13,18 @@ export const deleteTask = (task) => {
 
 export const statusChange = (task) => {
     const status = task.completed ? "reopen" : "close";
-    return axios.post(
-        `https://api.todoist.com/rest/v1/tasks/${task.id}/${status}`, null);
+    return axios.post(`https://api.todoist.com/rest/v1/tasks/${task.id}/${status}`, null);
 };
 
 export const fetchTasks = () => {
-    return axios.get("https://api.todoist.com/rest/v1/tasks");
+    return new Promise((resolve,reject) => {
+        axios.get("https://api.todoist.com/rest/v1/tasks")
+            .then(({data = []}) => {
+                const tasks = data.filter(tsk => !tsk.section_id);
+                resolve(tasks);
+            })
+            .catch(reject)
+    });
 };
 
 export const addTask = (newTask, datetime) => {

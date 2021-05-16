@@ -1,7 +1,7 @@
 import {makeStyles} from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import {useContext, useEffect, useState} from "react";
-import {addTask, fetchTasks} from "./api-serivice";
+import {addTask, fetchTasks} from "../services/api-serivice";
 import {GlobalCtx} from "../context/global-context";
 import {ThemeProvider} from "@material-ui/styles";
 import {Button, createMuiTheme} from "@material-ui/core";
@@ -78,13 +78,10 @@ const NewTask = () => {
     const addNewTask = () => {
         if (newTask) {
             addTask(newTask, new Date(datetime))
-                .then(() => {
-                    history.push('/');
-                })
+                .then(() => history.push('/'))
                 .catch(console.log);
         } else alert("Insert task name");
     };
-
 
     return (
         <div className={classes.wrapper}>

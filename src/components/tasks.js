@@ -1,6 +1,6 @@
 import Task from "./task";
 import {useContext, useEffect, useState} from "react";
-import {fetchTasks} from "./api-serivice";
+import {fetchTasks} from "../services/api-serivice";
 import {GlobalCtx} from "../context/global-context";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {makeStyles} from "@material-ui/core/styles";
@@ -15,47 +15,45 @@ const TasksStyle = makeStyles({
         alignItems: 'center',
         '& > div': {
             width: '100%',
-            height:'inherit',
+            height: 'inherit',
         }
     },
-    noResult:{
-        display:'flex',
-        justifyContent:'center',
-        alignItems:'center',
-        flexDirection:'column'
+    noResult: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column'
     }
 })
 
 const Tasks = () => {
     const {tasks, setTasks} = useContext(GlobalCtx);
-    const [loader,setLoader] = useState(true);
+    const [loader, setLoader] = useState(true);
     const style = TasksStyle();
 
     useEffect(() => {
         fetchAllTasks();
-    },[])
+    }, [])
 
     const fetchAllTasks = () => {
         setLoader(true);
         fetchTasks()
-            .then((res) => {
-                setTasks(res.data);
-                setLoader(false);
-            })
-            .catch(console.log);
+            .then((res) => setTasks(res))
+            .catch(console.log)
+            .finally(() => setLoader(false))
     };
 
-    const handleLoader = () => {
-        const isExist = tasks.some(item => !item.section_id);
-        if (isExist)
+    const renderTasks = () => {
+        if (!!tasks.length)
             return (
                 <div>
                     {tasks.map((task) => (
-                        <Task key={task.id} task={task} fetchTasks={fetchAllTasks}></Task>
+                        <Task key={task.id} task={task} fetchTasks={fetchAllTasks}/>
                     ))}
                 </div>
             )
-        else return (
+
+        return (
             <div className={style.noResult}>
                 <p>There is no Task</p>
                 <Link to="/newTask">Add Task</Link>
@@ -65,7 +63,9 @@ const Tasks = () => {
 
     return (
         <section className={style.tasks}>
-            {tasks && tasks.length && !loader ? handleLoader() : <CircularProgress disableShrink/>}
+            {loader && <CircularProgress disableShrink/>}
+
+            {!loader &&renderTasks()}
         </section>
     );
 };

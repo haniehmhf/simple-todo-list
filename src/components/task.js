@@ -1,5 +1,5 @@
 import {Button} from "@material-ui/core";
-import {deleteTask, statusChange} from "./api-serivice";
+import {deleteTask, statusChange} from "../services/api-serivice";
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {useContext} from "react";

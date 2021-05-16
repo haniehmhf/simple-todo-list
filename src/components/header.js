@@ -5,7 +5,7 @@ import {useHistory, useLocation} from "react-router-dom";
 import {ArrowBack} from "@material-ui/icons";
 import IconButton from "@material-ui/core/IconButton";
 
-const HeaderStyle = makeStyles({
+const useStyles = makeStyles({
     header: {
         width: '100%',
         height: '40px',
@@ -39,7 +39,7 @@ const HeaderStyle = makeStyles({
 })
 
 const Header = () => {
-    const style = HeaderStyle();
+    const classes = useStyles();
     const history = useHistory();
     let {pathname} = useLocation();
 
@@ -50,9 +50,9 @@ const Header = () => {
             history.push("/newTask")
     }
     return (
-        <div className={style.header}>
+        <div className={classes.header}>
             <span> ToDo List </span>
-            <IconButton className={style.button} variant="contained" color="default"
+            <IconButton className={classes.button} variant="contained" color="default"
                         size="small" onClick={onRoute}>
                 {pathname == '/newTask' ? <ArrowBack/> : <AddIcon/>}
             </IconButton>

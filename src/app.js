@@ -1,4 +1,3 @@
-import "./App.scss";
 import Header from "./components/header";
 import Tasks from "./components/tasks";
 import NewTask from "./components/new-task";
@@ -12,6 +11,7 @@ import {
 } from "react-router-dom";
 import {makeStyles} from "@material-ui/core/styles";
 import {useEffect} from "react";
+import {authorizeUser} from "./services/auth-service";
 
 const AppStyle = makeStyles({
     content: {
@@ -42,16 +42,8 @@ const history = createBrowserHistory();
 
 function App() {
     const style = AppStyle();
-
-
     useEffect(() => {
-        if (!localStorage.getItem('token')) {
-            const mytoken = '01ddd97564de72d38036789a32e7970372df6351'
-            let token = prompt("You need todoist a token to login this app " +
-                "if you dont have it ,you can get it from " +
-                "https://todoist.com or click ok to use my token")
-            localStorage.setItem('token', (token || mytoken))
-        }
+        authorizeUser()
     }, []);
 
     return (
